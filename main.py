@@ -1,22 +1,22 @@
 import openai
 import sys
 
-def read_api_key():
+def read_contents(filename):
     try:
-        with open('key', 'r') as f:
+        with open(filename, 'r') as f:
             return f.read().strip()
     except FileNotFoundError:
-        print("Error: API key file 'key' not found.")
-        sys.exit(1)
+        print("Error: coiuldn't open" + filename)
+        return 0
 
 def main():
-    api_key = read_api_key()
+    api_key = read_contents('key')
+    model_name = read_contents('model')
+
     openai.api_key = api_key
 
-    model_name = "gpt-4"  # Or any other appropriate model
-
     while True:
-        user_input = input("You: ")
+        user_input = input ("λ ")
         if user_input.lower() == 'exit':
             print("Exiting...")
             break
@@ -30,7 +30,7 @@ def main():
         )
 
         response = completion.choices[0].message['content']
-        print("GPT-4:", response)
+        print("Σ", response)
 
 if __name__ == "__main__":
     main()
