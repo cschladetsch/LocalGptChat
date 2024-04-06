@@ -7,6 +7,7 @@ from datetime import datetime
 # ANSI color codes
 BLUE = '\033[94m'
 GREEN = '\033[92m'
+CYAN = '\033[96m'
 DARK_GREY = '\033[90m'
 END = '\033[0m'
 
@@ -75,7 +76,11 @@ def main():
         response = completion.choices[0].message['content']
         append_to_log(f'AI response: {response}', log_file)
 
-        print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
+        if '```' in response:
+            print(f"{DARK_GREY}Σ{END} {CYAN}{response}{END}")
+            write_code_to_file(response)
+        else:
+            print(f"Σ{END} {GREEN}{response}{END}")
 
 if __name__ == "__main__":
     main()
