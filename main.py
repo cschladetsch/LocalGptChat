@@ -21,23 +21,16 @@ ext_map = {
 
 def write_code_to_file(code, dir_path='./'):
     # Extract language and code content from the code snippet
-    match = re.match(r'.*```(.*?)```', code, re.DOTALL)
+    match = re.match(r'```(.*?)```', code, re.DOTALL)
     if match:
-        language = match.group(1).strip()
-        code_content = match.group(2).strip()
-        
-        # Determine file extension based on the language
-        file_ext = ext_map.get(language.lower())
-        if not file_ext:
-            print(f"{DARK_GREY}Σ{END} Error: Unsupported language '{language}'")
-            return
-        
+        code_content = match.group(1).strip()
+
         # Write the code content to file
         timestamp = datetime.now().isoformat(timespec='seconds').replace(':', '-')
-        file_name = f'request_{timestamp}{file_ext}'
+        file_name = f'request_{timestamp}.txt'
         file_path = os.path.join(dir_path, file_name)
         with open(file_path, 'w') as f:
-            f.write(code_content.strip('`'))
+            f.write(code_content)
         
         print(f"{DARK_GREY}Σ{END} Code written to file: {file_path}")
     else:
@@ -82,10 +75,7 @@ def main():
         response = completion.choices[0].message['content']
         append_to_log(f'AI response: {response}', log_file)
 
-        if '```' in response:
-            write_code_to_file(response)
-        else:
-            print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
+        print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
 
 if __name__ == "__main__":
     main()
