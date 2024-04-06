@@ -20,41 +20,11 @@ ext_map = {
 
 def write_code_to_file(code, dir_path='./'):
     # Extract language and code content from the code snippet
-    match = re.match(r'write code that (.*?) in (.*?)```(.*?)```', code, re.DOTALL)
+    match = re.match(r'.*```(.*?)```', code, re.DOTALL)
     if match:
         action = match.group(1).strip()
         language = match.group(2).strip()
         code_content = match.group(3).strip()
-        if action == 'adds 1 and 2' and language.lower() == 'python':
-            code_content = 'result = 1 + 2'
-        elif action == 'calculates all primes up to 100' and language.lower() == 'cpp':
-            code_content = """
-            #include <iostream>
-            #include <vector>
-            using namespace std;
-
-            bool is_prime(int n) {
-                if (n <= 1) return false;
-                for (int i = 2; i * i <= n; i++) {
-                    if (n % i == 0) return false;
-                }
-                return true;
-            }
-
-            int main() {
-                vector<int> primes;
-                for (int i = 2; i <= 100; i++) {
-                    if (is_prime(i)) primes.push_back(i);
-                }
-                for (int prime : primes) {
-                    cout << prime << " ";
-                }
-                return 0;
-            }
-            """
-        else:
-            print(f"{DARK_GREY}Σ{END} Error: Unsupported action or language")
-            return
         
         # Determine file extension based on the language
         file_ext = ext_map.get(language.lower())
@@ -102,10 +72,10 @@ def main():
 
         response = completion.choices[0].message['content']
 
-        if user_input.startswith("write") and '```' in response:
-            write_code_to_file(response)
-        else:
-            print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
+        #if '```' in response:
+        #write_code_to_file(response)
+        #else:
+        print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
 
 if __name__ == "__main__":
     main()
