@@ -2,6 +2,7 @@ import openai
 import sys
 import os
 import re
+from datetime import datetime
 
 # ANSI color codes
 BLUE = '\033[94m'
@@ -22,9 +23,8 @@ def write_code_to_file(code, dir_path='./'):
     # Extract language and code content from the code snippet
     match = re.match(r'.*```(.*?)```', code, re.DOTALL)
     if match:
-        action = match.group(1).strip()
-        language = match.group(2).strip()
-        code_content = match.group(3).strip()
+        language = match.group(1).strip()
+        code_content = match.group(2).strip()
         
         # Determine file extension based on the language
         file_ext = ext_map.get(language.lower())
@@ -33,7 +33,8 @@ def write_code_to_file(code, dir_path='./'):
             return
         
         # Write the code content to file
-        file_name = f'file_{len(os.listdir(dir_path)) + 1}{file_ext}'
+        timestamp = datetime.now().isoformat(timespec='seconds').replace(':', '-')
+        file_name = f'request_{timestamp}{file_ext}'
         file_path = os.path.join(dir_path, file_name)
         with open(file_path, 'w') as f:
             f.write(code_content.strip('`'))
@@ -41,6 +42,11 @@ def write_code_to_file(code, dir_path='./'):
         print(f"{DARK_GREY}Σ{END} Code written to file: {file_path}")
     else:
         print(f"{DARK_GREY}Σ{END} Error: Could not extract code snippet from the input.")
+
+def append_to_log(content, log_file):
+    timestamp = datetime.now().isoformat(timespec='seconds')
+    with open(log_file, 'a') as f:
+        f.write(f"[{timestamp}] {content}\n")
 
 def read_contents(filename):
     try:
@@ -56,8 +62,11 @@ def main():
 
     openai.api_key = api_key
 
+    log_file = 'log.txt'
+
     while True:
         user_input = input(f"{BLUE}λ {END}")
+        append_to_log(f'User input: {user_input}', log_file)
         if user_input.lower() == 'exit':
             print("Exiting...")
             break
@@ -71,12 +80,12 @@ def main():
         )
 
         response = completion.choices[0].message['content']
+        append_to_log(f'AI response: {response}', log_file)
 
-        #if '```' in response:
-        #write_code_to_file(response)
-        #else:
-        print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
+        if '```' in response:
+            write_code_to_file(response)
+        else:
+            print(f"{DARK_GREY}Σ{END} {GREEN}{response}{END}")
 
 if __name__ == "__main__":
     main()
-
